@@ -109,6 +109,38 @@ class QuestionController extends Controller
             return 401;
         }
 
-        return view('add_question');
-    }    
+        $questionDetails=$questionDetails=DB::table('question')
+                         ->join('question_option','question_option.question_id','=','question.id')
+                         ->select('question.*','question_option.id as option_id','question_option.option_title','question_option.option_value')
+                         ->where('question.id',$questionId)
+                         ->get();
+
+        // echo '<pre>';
+        // print_r($questionDetails);
+        // return;                 
+        return view('edit_question',compact('questionDetails'));
+    }   
+    
+    
+    public function questionAddNewOption(Request $request,$questionId){
+        if (!$request->hasValidSignature()) {
+            return json_encode(array('status'=>403,'msg'=>'Unauthorized'));
+        }
+
+        $question=Question::find($questionId);
+
+        
+
+
+    }
+
+    public function questionOptionDelete(Request $request,$optionId){
+        if (!$request->hasValidSignature()) {
+            return 401;
+        }
+
+        DB::table('question_option')->where('id',$optionId)->delete();
+        return redirect()->back();
+
+    }
 }

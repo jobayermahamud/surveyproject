@@ -357,7 +357,7 @@
 
                        <div class="col-md-12" id='text_con' style='display:none'>
                          <div class="form-group row">
-                          <label class="form-check-label">Add title for this option </label> 
+                          {{-- <label class="form-check-label">Add title for this option </label>  --}}
                          </div> 
                         <div class="form-group row">
                           
