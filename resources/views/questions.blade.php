@@ -354,7 +354,7 @@
                                 @endif
                             </td>
                             <td>
-                                <a data-toggle="tooltip" data-placement="top" title="EDIT" class='btn btn-lg btn-success' style='color:white' href='{{url('edit_question')}}'><span class="ti-pencil"></span></a>
+                                <a data-toggle="tooltip" data-placement="top" title="EDIT" class='btn btn-lg btn-success' style='color:white' href='{{URL::signedRoute('question_edit', ['questionId' => $question->id])}}'><span class="ti-pencil"></span></a>
                                 <a data-toggle="tooltip" data-placement="top" title="VIEW" class='btn btn-lg btn-primary' style='color:white' href='{{URL::signedRoute('question_details', ['questionId' => $question->id])}}'><span class="ti-eye"></span></a>
                                 <a data-toggle="tooltip" data-placement="top" title="DELETE" class='btn btn-lg btn-danger' style='color:white' href='{{URL::signedRoute('delete_question', ['questionId' => $question->id])}}'><span class="ti-trash"></span></a>
                               

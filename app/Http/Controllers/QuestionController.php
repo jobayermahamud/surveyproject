@@ -102,4 +102,13 @@ class QuestionController extends Controller
 
 
     }
+
+
+    public function questionEdit(Request $request,int $questionId){
+        if (!$request->hasValidSignature()) {
+            return 401;
+        }
+
+        return view('add_question');
+    }    
 }

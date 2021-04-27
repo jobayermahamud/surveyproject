@@ -27,6 +27,7 @@ Route::match(['get'], 'questions',[QuestionController::class,'index']);
 Route::match(['get'], 'question_status_change/{questionId}',[QuestionController::class,'changeStatus'])->name('change_status');
 Route::match(['get'], 'question_delete/{questionId}',[QuestionController::class,'deleteQuestion'])->name('delete_question');
 Route::match(['get'], 'question_details/{questionId}',[QuestionController::class,'questionDetails'])->name('question_details');
+Route::match(['get'], 'question_edit/{questionId}',[QuestionController::class,'questionEdit'])->name('question_edit');
 Route::match(['get', 'post'], 'add_question',[QuestionController::class,'addQuestion']);
 
 
