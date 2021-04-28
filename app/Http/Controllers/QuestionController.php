@@ -115,7 +115,7 @@ class QuestionController extends Controller
             if($question->option_type != $request->input('opt_type')){
                 DB::table('question_option')->where('question_id', $questionId)->delete();
             }
-
+            $question->question_name=$request->input('question_name');
             $question->option_type=$request->input('opt_type');
             $question->is_active=$request->input('sts_opt');
             $question->save();
