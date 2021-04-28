@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\SurveyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,3 +37,16 @@ Route::match(['post'], 'question_edit_option/{optionId}',[QuestionController::cl
 Route::match(['get'], 'question_delete_option/{optionId}',[QuestionController::class,'questionOptionDelete'])->name('question_delete_option');
 
 // QuestionControllerRoute end
+
+
+// Survey route start
+
+Route::match(['get', 'post'], 'addsurvey',[SurveyController::class,'addSurvey']);
+Route::match(['get'], 'survey',[SurveyController::class,'index'])->name('survey');
+Route::match(['get'], 'survey_delete/{surveyId}',[SurveyController::class,'deleteSurvey'])->name('delete_survey');
+Route::match(['get'], 'survey_details/{surveyId}',[SurveyController::class,'surveyDetails'])->name('survey_details');
+Route::match(['get'], 'survey_status_change/{surveyId}',[SurveyController::class,'changeStatus'])->name('change_survey_status');
+
+Route::match(['get','post'], 'survey_edit/{surveyId}',[SurveyController::class,'surveyEdit'])->name('survey_edit');
+
+// Survey Route end
