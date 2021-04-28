@@ -7,7 +7,7 @@
     /* outline: none; */
     margin-left: 15px;
     vertical-align: top;
-    margin-top: -9px;
+    margin-top: -21px;
     width: 94%;
 
     }
@@ -295,7 +295,7 @@
               <div class="card">
                 <div class="card-body">
                   <h4 class="card-title">Edit Question</h4>
-                  <form class="form-sample" method='post' action='{{url('add_question')}}'>
+                  <form class="form-sample" method='post' action='{{URL::signedRoute('question_edit', ['questionId' => $questionDetails[0]->id])}}'>
                     @csrf
                     <p class="card-description">
                       Question information
@@ -360,11 +360,16 @@
                         <tr>
                             
                             <td>
-                                <input checked type='checkbox' />&nbsp;&nbsp;{{$option->option_title}}
+                              <div class="form-group row">
+                                
+                                  
+                                <input type="checkbox" name='multi_opt' value='1'/><input type='text' id='edit_option_text_value_{{$option->option_id}}' class='opt_lable_text' name='opt_label' value='{{$option->option_title}}'/>
+                              </div>
+                        
                             </td>
                             
                             <td>
-                                <a data-toggle="tooltip" data-placement="top" title="EDIT" class='btn btn-sm btn-success ti-pencil' style='color:white' href='#'></a>
+                                <a data-toggle="tooltip" data-placement="top" title="EDIT" class='btn btn-sm btn-success ti-pencil' style='color:white' custom_type='edit_option' id_ref='{{$option->option_id}}' href='{{URL::signedRoute('question_edit_option', ['optionId' => $option->option_id])}}'></a>
                                 {{-- <a data-toggle="tooltip" data-placement="top" title="VIEW" class='btn btn-lg btn-primary' style='color:white' href='#'><span class="ti-eye"></span></a> --}}
                                 <a data-toggle="tooltip" data-placement="top" title="DELETE" class='btn btn-sm btn-danger ti-trash' style='color:white' href='{{URL::signedRoute('question_delete_option', ['optionId' => $option->option_id])}}'></a>
                                 
@@ -377,11 +382,11 @@
                         <tr>
                             <td>
                                 <div class="form-group row">
-                                <input type="checkbox" name='multi_opt[]' value='1'/><input type='text' class='opt_lable_text' name='opt_label[]' value='Option 2'/>
+                                <input type="checkbox" name='multi_opt[]' value='1'/><input type='text' id='add_option_text_value' class='opt_lable_text' name='opt_label[]' value='Option 2'/>
                                 </div>
                             </td>
                             <td>
-                                <a data-toggle="tooltip" data-placement="top" title="ADD NEW OPTION" class='btn btn-sm btn-success ti-plus' style='color:white' href='#'></a>
+                                <a data-toggle="tooltip" data-placement="top" title="ADD NEW OPTION" class='btn btn-sm btn-success ti-plus' id='add_option_to_question' style='color:white' href='{{URL::signedRoute('question_add_new_option', ['questionId' => $questionDetails[0]->id])}}'></a>
                                 {{-- <a data-toggle="tooltip" data-placement="top" title="VIEW" class='btn btn-lg btn-primary' style='color:white' href='#'><span class="ti-eye"></span></a> --}}
                                 {{-- <a data-toggle="tooltip" data-placement="top" title="DELETE" class='btn btn-sm btn-danger ti-trash' style='color:white' href='#'></a> --}}
                               
@@ -480,3 +485,5 @@
     });
 
   </script>
+
+  <script src="{{asset('js/custom_app.js')}}"></script>

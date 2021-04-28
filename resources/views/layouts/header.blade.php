@@ -22,4 +22,5 @@
   <link rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}">
   <!-- endinject -->
   <link rel="shortcut icon" href="{{asset('images/favicon.png')}}" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
