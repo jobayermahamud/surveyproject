@@ -46,7 +46,8 @@ Route::match(['get'], 'survey',[SurveyController::class,'index'])->name('survey'
 Route::match(['get'], 'survey_delete/{surveyId}',[SurveyController::class,'deleteSurvey'])->name('delete_survey');
 Route::match(['get'], 'survey_details/{surveyId}',[SurveyController::class,'surveyDetails'])->name('survey_details');
 Route::match(['get'], 'survey_status_change/{surveyId}',[SurveyController::class,'changeStatus'])->name('change_survey_status');
-
+Route::match(['get'], 'add_question/{qId}/{sId}',[SurveyController::class,'addQuestion'])->name('add_question');
+Route::match(['get'], 'rm_question/{qId}/{sId}',[SurveyController::class,'rmQuestion'])->name('rm_question');
 Route::match(['get','post'], 'survey_edit/{surveyId}',[SurveyController::class,'surveyEdit'])->name('survey_edit');
 
 // Survey Route end

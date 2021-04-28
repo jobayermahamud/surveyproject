@@ -303,7 +303,15 @@
                         </button>
                        </div>
                   @endif
-                  <form class="form-sample" method='post' action='{{url('addsurvey')}}'>
+                  @if (Session::has('success'))
+                      <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> {{Session::get('success')}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                       </div>
+                  @endif
+                  <form class="form-sample" method='post' action='{{URL::signedRoute('survey_edit', ['surveyId' => $surveyDetails[0]->id])}}'>
                     @csrf
                     <p class="card-description">
                       Survey information
@@ -353,14 +361,18 @@
                         </tr>
                       </thead>
                       <tbody>
+                        
                         @foreach ($questions as $question)
-                        <tr>
-                            <td>
-                                <input type='checkbox' name='question_list[]' value='{{$question->id}}'/>&nbsp;&nbsp;{{$question->question_name}}
-                            </td>
+                        
+                            <tr>
+                              <td>
+                                  <input add_url='{{URL::signedRoute('add_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' rm_url='{{URL::signedRoute('rm_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' {{checkQuestionExists($question->id,$surveyDetails[0]->id) ? 'checked' : ''}}  type='checkbox' name='question_list[]' value='{{$question->id}}'/>&nbsp;&nbsp;{{$question->question_name}}
+                              </td>
                             
                             
-                            </tr>
+                             </tr>
+                        
+                        
                         @endforeach  
                         
                         
@@ -436,6 +448,23 @@
       
     $(document).ready(function(){
         $('#questions').DataTable();
+
+        addEventListener('change',(e)=>{
+          if(e.target.type!='checkbox'){
+            return;
+          }
+          if(e.target.checked){
+            //console.log(e.target.getAttribute('add_url'));
+            $.get(e.target.getAttribute('add_url'), function(data, status){
+               location.reload();
+            });
+          }else{
+            //console.log(e.target.getAttribute('rm_url'));
+            $.get(e.target.getAttribute('rm_url'), function(data, status){
+               console.log();
+            });
+          }
+        })
     });
 
   </script>

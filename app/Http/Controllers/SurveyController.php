@@ -14,6 +14,8 @@ class SurveyController extends Controller
         return view('survey_list',compact('surveylist'));
     }
 
+
+    
     public function changeStatus(Request $request,int $surveyId){
         if (! $request->hasValidSignature()) {
             return json_encode(array('status'=>'403','msg'=>'Unauthorized'));
@@ -142,16 +144,30 @@ class SurveyController extends Controller
         }
 
         if($request->isMethod('post')){
-            $question=Question::find($questionId);
-
-            if($question->option_type != $request->input('opt_type')){
-                DB::table('question_option')->where('question_id', $questionId)->delete();
+            if($request->input('survey_name')==''){
+                $request->session()->flash('error','Survey name is required');
+                return redirect()->back();
+            }
+            if($request->input('date_from')==''){
+                $request->session()->flash('error','Date from is required');
+                return redirect()->back();
             }
 
-            $question->option_type=$request->input('opt_type');
-            $question->is_active=$request->input('sts_opt');
-            $question->save();
+            if($request->input('date_to')==''){
+                $request->session()->flash('error','Date to is required');
+                return redirect()->back();
+            }
+            $survey=Survey::find($surveyId);
+            $survey->survey_name=$request->input('survey_name');
+            $survey->date_from=$request->input('date_from');
+            $survey->date_to=$request->input('date_to');
+            $survey->survey_status=$request->input('sts_opt');
 
+            $survey->save();
+
+
+            
+            $request->session()->flash('success','Information updated');
             return redirect()->back();
 
 
@@ -163,12 +179,42 @@ class SurveyController extends Controller
                          ->join('question','survey_question.question_id','=','question.id')
                          ->select('survey.*','survey_question.question_id as survey_question_id','question.question_name','question.id as question_id')
                          ->where('survey.id',$surveyId)
+                         ->orderBy('question.id')
                          ->get();
 
-        $questions=Question::all();                 
+        $questions=DB::table('question')->get();               
         // echo '<pre>';
-        // print_r($surveyDetails);
+        // print_r($questions);
         // return;                 
         return view('edit_survey',compact('surveyDetails','questions'));
     }
+
+
+    public function addQuestion(Request $request,$qId,$sId){
+        if (! $request->hasValidSignature()) {
+            return 401;
+        }
+        DB::table('survey_question')->insert([
+                            'survey_id' =>$sId,
+                            'question_id'=>$qId
+        ]);
+
+        return json_encode(array('status'=>200,'msg'=>'New question added'));
+
+    }
+
+    public function rmQuestion(Request $request,$qId,$sId){
+        DB::beginTransaction();
+            DB::table('survey_question')->where('question_id',$qId)->where('survey_id',$sId)->delete();
+            $checkQuestion=DB::table('survey_question')->where('survey_id',$sId)->get();
+            
+            if(count($checkQuestion)>0){
+                DB::commit();
+            }else{
+                DB::rollBack();
+                return json_encode(array('status'=>403,'msg'=>'You must select at least one question'));
+            }
+    }
+
+    
 }
