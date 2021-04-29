@@ -50,7 +50,7 @@ Route::match(['get'], 'survey_status_change/{surveyId}',[SurveyController::class
 Route::match(['get'], 'add_question/{qId}/{sId}',[SurveyController::class,'addQuestion'])->name('add_question');
 Route::match(['get'], 'rm_question/{qId}/{sId}',[SurveyController::class,'rmQuestion'])->name('rm_question');
 Route::match(['get','post'], 'survey_edit/{surveyId}',[SurveyController::class,'surveyEdit'])->name('survey_edit');
-
+Route::match(['get'], 'surveyreport',[SurveyController::class,'surveyReportList'])->name('sr_report');
 // Survey Route end
 
 

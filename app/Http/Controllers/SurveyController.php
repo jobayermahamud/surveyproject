@@ -216,5 +216,21 @@ class SurveyController extends Controller
             }
     }
 
+
+
+    public function surveyReportList(Request $request){
+        $surveyList=DB::table('survey')
+                    ->join('surveyresult','surveyresult.survey_id','=','survey.id')
+                    ->select('survey.*')
+                    ->distinct()
+                    ->get();
+
+
+         echo '<pre>';
+         print_r($surveyList);
+         return;           
+        return view('survey_report_list');
+    }
+
     
 }

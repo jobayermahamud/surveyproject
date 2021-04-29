@@ -300,7 +300,7 @@
             <div class="col-md-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Survey list</h4>
+                  <h4 class="card-title">Questions</h4>
                   
                   <div class="table-responsive pt-3">
                     <table id='questions' class="table table-bordered">
@@ -310,7 +310,7 @@
                             ID
                           </th>
                           <th>
-                            Survey name
+                            Question name
                           </th>
                           <th>
                               Range
@@ -325,38 +325,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach ($surveylist as $survey)
-                        <tr>
-                            <td>
-                                {{$survey->id}}
-                            </td>
-                            <td>
-                                {{$survey->survey_name}}
-                            </td>
-                            <td>
-                                {{date_format(date_create($survey->date_from),'d-M-y')}} To {{date_format(date_create($survey->date_to),'d-M-y')}}
-                            </td>
-                            <td>
-                                @if ($survey->survey_status==1)
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" url_ref='{{URL::signedRoute('change_survey_status', ['surveyId' => $survey->id])}}' checked class="custom-control-input" id="status_switch_{{$survey->id}}">
-                                        <label class="custom-control-label" for="status_switch_{{$survey->id}}"></label>
-                                    </div>
-                                @else
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" url_ref='{{URL::signedRoute('change_survey_status', ['surveyId' => $survey->id])}}' class="custom-control-input" id="status_switch_{{$survey->id}}">
-                                        <label class="custom-control-label" for="status_switch_{{$survey->id}}"></label>
-                                    </div>
-                                @endif
-                            </td>
-                            <td>
-                                <a data-toggle="tooltip" data-placement="top" title="EDIT" class='btn btn-lg btn-success' style='color:white' href='{{URL::signedRoute('survey_edit', ['surveyId' => $survey->id])}}'><span class="ti-pencil"></span></a>
-                                <a data-toggle="tooltip" data-placement="top" title="VIEW" class='btn btn-lg btn-primary' style='color:white' href='{{URL::signedRoute('survey_details', ['surveyId' => $survey->id])}}'><span class="ti-eye"></span></a>
-                                <a data-toggle="tooltip" data-placement="top" title="DELETE" class='btn btn-lg btn-danger' style='color:white' href='{{URL::signedRoute('delete_survey', ['surveyId' => $survey->id])}}'><span class="ti-trash"></span></a>
-                              
-                            </td>
-                            </tr>
-                        @endforeach  
+                         content here 
                         
                         
                       </tbody>
