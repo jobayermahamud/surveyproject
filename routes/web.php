@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\FrontendController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,3 +52,16 @@ Route::match(['get'], 'rm_question/{qId}/{sId}',[SurveyController::class,'rmQues
 Route::match(['get','post'], 'survey_edit/{surveyId}',[SurveyController::class,'surveyEdit'])->name('survey_edit');
 
 // Survey Route end
+
+
+
+// Frontend route start
+
+Route::match(['get'], 'surveyfront',[FrontendController::class,'index']);
+
+
+Route::match(['get'], 'multiopt/{surveyId}/{questionId}/{optionId}/{optionValue}',[FrontendController::class,'multiOption'])->name('ml_opt');
+Route::match(['post'], 'textopt/{surveyId}/{questionId}',[FrontendController::class,'textOption'])->name('text_opt');
+
+
+// Forintend route end

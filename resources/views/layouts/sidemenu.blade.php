@@ -1,11 +1,12 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
-          {{-- <li class="nav-item">
-            <a class="nav-link" href="index.html">
+          <li class="nav-item">
+            <a class="nav-link" href="{{url('surveyfront')}}">
               <i class="icon-grid menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
+              <span class="menu-title">Frontend</span>
             </a>
-          </li> --}}
+          </li>
+           
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
               <i class="icon-layout menu-icon"></i>
