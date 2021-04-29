@@ -330,7 +330,7 @@
                             <td>
                                 {{$question->id}}
                             </td>
-                            <td>
+                            <td >
                                 {{$question->question_name}}
                             </td>
                             <td>
