@@ -297,44 +297,68 @@
           
           
           <div class="row">
+            <h3 style='margin-left:30px;width:100%;padding:3px;background-color:white'>Survey name {{$survey->name}}</h3> 
+            <hr> 
+            
+            @foreach ($processData as $key=>$value)
             <div class="col-md-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Questions</h4>
                   
-                  <div class="table-responsive pt-3">
-                    <table id='questions' class="table table-bordered">
+                  <div class="card">
+                        <div class="card-body">
+                        <h4 class="card-title">{{$processData[$key][0]->question_name}}</h4>
+                        @php
+                            $total_part=0;
+                        @endphp
+                        <div>
+                            @foreach ($value as $item)
+                                @php
+                                    $total_part+=$item->total;
+                                @endphp
+                                <p>{{$item->option_value}} ({{$item->total}})</p>
+                            @endforeach
+                            
+                        </div>
+                        <h3>Total participate : {{$total_part}}</h3>
+                        </div>
+                  </div>
+               
+              
+            </div>
+            @endforeach 
+            <hr>
+            @if (count($surveyTextOption)>0)
+                <div style='background-color:white' class="table-responsive pt-3">
+                    <table id='' class="table table-bordered">
                       <thead>
                         <tr>
-                          <th>
-                            ID
-                          </th>
+                          
                           <th>
                             Question name
                           </th>
                           <th>
-                            Action
+                              Comment
                           </th>
+                          
+                          
                         </tr>
                       </thead>
                       <tbody>
-                         @foreach ($surveyList as $survey)
-                             <tr>
-                               <td>{{$survey->id}}</td>
-                               <td>{{$survey->survey_name}}</td>
-                               <td width='50px'>
-                                 <a href='{{URL::signedRoute('report_details', ['surveyId' => $survey->id])}}' data-toggle="tooltip" data-placement="top" title='SEE FULL REPORT' class='ti-files btn btn-primary btn-sm'></a>
-                               </td>
-                             </tr>
-                         @endforeach
+                        @foreach ($surveyTextOption as $text)
+                           <tr>
+                             <td>
+                                 {{$text->question_name}}
+                             </td>
+                             <td>
+                                 {{$text->option_value}}
+                             </td>
+                            </tr>
+                        @endforeach  
                         
                         
                       </tbody>
                     </table>
                   </div>
-                </div>
-              </div>
-            </div>
+            @endif
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->

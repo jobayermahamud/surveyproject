@@ -39,7 +39,7 @@ class SurveyController extends Controller
 
     public function deleteSurvey(Request $request,int $surveyId){
         if (! $request->hasValidSignature()) {
-            return 401;
+            abort(401);
         }
         DB::transaction(function () use($surveyId){
             $Survey=Survey::find($surveyId);
@@ -118,7 +118,7 @@ class SurveyController extends Controller
 
     public function surveyDetails(Request $request,$surveyId){
         if (! $request->hasValidSignature()) {
-            return 401;
+            abort(401);
         }
         $surveyDetails=DB::table('survey')
                          ->join('survey_question','survey.id','=','survey_question.survey_id')
@@ -140,7 +140,7 @@ class SurveyController extends Controller
 
     public function surveyEdit(Request $request,int $surveyId){
         if (!$request->hasValidSignature()) {
-            return 401;
+            abort(401);
         }
 
         if($request->isMethod('post')){
@@ -192,7 +192,7 @@ class SurveyController extends Controller
 
     public function addQuestion(Request $request,$qId,$sId){
         if (! $request->hasValidSignature()) {
-            return 401;
+            abort(401);
         }
         DB::table('survey_question')->insert([
                             'survey_id' =>$sId,
@@ -219,18 +219,80 @@ class SurveyController extends Controller
 
 
     public function surveyReportList(Request $request){
-        $surveyList=DB::table('survey')
-                    ->join('surveyresult','surveyresult.survey_id','=','survey.id')
+        // $surveyList=DB::table('surveyresult')
+        //             ->join('survey','surveyresult.survey_id','=','survey.id')
+        //             ->select(DB::raw('surveyresult.option_value,survey.id,survey.survey_name,COUNT(surveyresult.survey_id) as total'))
+        //             ->groupBy('survey.id')
+        //             ->groupBy('surveyresult.option_value')
+        //             ->groupBy('survey.survey_name')
+        //             ->where('surveyresult.option_type',1)
+        //             ->get();
+        
+        $surveyList=DB::table('surveyresult')
+                    ->join('survey','surveyresult.survey_id','=','survey.id')
                     ->select('survey.*')
                     ->distinct()
-                    ->get();
+                    ->get();            
 
 
-         echo '<pre>';
-         print_r($surveyList);
-         return;           
-        return view('survey_report_list');
+        //  echo '<pre>';
+        //  print_r($surveyList);
+        //  return;           
+        return view('survey_report_list',compact('surveyList'));
     }
 
+
+    public function surveyReportFull(Request $request,$surveyId){
+        if (! $request->hasValidSignature()) {
+            abort(401);
+        }
+
+
+        $surveyMultipleChooseResult=DB::table('surveyresult')
+                    ->join('survey','surveyresult.survey_id','=','survey.id')
+                    ->join('question','surveyresult.question_id','=','question.id')
+                    ->select(DB::raw('question.id as question_id,question.question_name,surveyresult.option_value,survey.id,survey.survey_name,COUNT(surveyresult.survey_id) as total'))
+                    ->groupBy('survey.id')
+                    ->groupBy('surveyresult.option_value')
+                    ->groupBy('survey.survey_name')
+                    ->groupBy('question.id')
+                    ->groupBy('question.question_name')
+                    ->where('surveyresult.option_type',1)
+                    ->where('survey.id',$surveyId)
+                    ->orderBy('total')
+                    ->orderBy('surveyresult.option_id')
+                    ->get();
+        
+        $surveyTextOption= DB::table('surveyresult')
+                    ->join('survey','surveyresult.survey_id','=','survey.id')
+                    ->join('question','surveyresult.question_id','=','question.id')
+                    ->select('question.id as question_id','question.question_name','surveyresult.option_value','survey.id','survey.survey_name')
+                    ->where('survey.id',$surveyId)
+                    ->where('surveyresult.option_type',0)
+                    ->get();
+        
+        
+
+
+        $processData=array();
+        for($i=0;$i<count($surveyMultipleChooseResult);$i++){
+            //echo $surveyMultipleChooseResult[$i]->question_id;
+            if(isset($processData[$surveyMultipleChooseResult[$i]->question_id])){
+                array_push($processData[$surveyMultipleChooseResult[$i]->question_id],$surveyMultipleChooseResult[$i]);
+            }else{
+                $processData[$surveyMultipleChooseResult[$i]->question_id]=array();
+                array_push($processData[$surveyMultipleChooseResult[$i]->question_id],$surveyMultipleChooseResult[$i]);
+            }
+        }
+
+        $survey=Survey::where('id',$surveyId)->get()[0];
+
+        // echo '<pre>';
+        // print_r($surveyTextOption);
+        // return;            
+        
+        return view('details_report',compact('processData','survey','surveyTextOption'));
+
+    }
     
 }
