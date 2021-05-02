@@ -73,10 +73,10 @@ class QuestionController extends Controller
                 }
 
                 if($question->option_type==1){
-                    for($i=0;$i<count($request->input('multi_opt'));$i++){
+                    for($i=0;$i<count($request->input('opt_label'));$i++){
                         DB::table('question_option')->insert([
-                            'option_title' =>$request->input('opt_label')[$request->input('multi_opt')[$i]],
-                            'option_value' =>$request->input('multi_opt')[$i],
+                            'option_title' =>$request->input('opt_label')[$i],
+                            'option_value' =>$i,
                             'question_id' => $question->id,
                         ]);
                     }

@@ -313,7 +313,7 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Option type</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" {{$questionDetails[0]->option_type ==0 ? 'checked' : '' }} class="form-check-input" name="opt_type" id="text_opt_sl" value="0">
@@ -400,7 +400,7 @@
                         
                       </div>
 
-                       <div class="col-md-12" id='text_con' style='{{$questionDetails[0]->option_type == 0 ? '' : 'display:none' }}'>
+                       <div class="col-md-12" id='text_con' style='{{$questionDetails[0]->option_type == 0 ? 'display:none' : 'display:none' }}'>
                          <div class="form-group row">
                           {{-- <label class="form-check-label">Add title for this option </label>  --}}
                          </div> 
@@ -415,7 +415,7 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Status</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" {{$questionDetails[0]->is_active ==1 ? 'checked' : '' }} class="form-check-input" name="sts_opt" id="membershipRadios1" value="1" checked="">
@@ -476,10 +476,10 @@
        $('[data-toggle="tooltip"]').tooltip()
        $("#multi_opt_sl").click(function(e){
         document.getElementById('multi_con').style=''
-        document.getElementById('text_con').style='display:none'
+        // document.getElementById('text_con').style='display:none'
     });
     $("#text_opt_sl").click(function(){
-       document.getElementById('text_con').style=''
+      //  document.getElementById('text_con').style=''
        document.getElementById('multi_con').style='display:none'
     });
     });

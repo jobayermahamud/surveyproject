@@ -184,7 +184,7 @@ class SurveyController extends Controller
 
         $questions=DB::table('question')->get();               
         // echo '<pre>';
-        // print_r($questions);
+        // print_r($surveyDetails);
         // return;                 
         return view('edit_survey',compact('surveyDetails','questions'));
     }
@@ -287,9 +287,9 @@ class SurveyController extends Controller
 
         $survey=Survey::where('id',$surveyId)->get()[0];
 
-        // echo '<pre>';
-        // print_r($surveyTextOption);
-        // return;            
+        echo '<pre>';
+        print_r($surveyMultipleChooseResult);
+        return;            
         
         return view('details_report',compact('processData','survey','surveyTextOption'));
 

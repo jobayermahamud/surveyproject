@@ -81,11 +81,11 @@
                       
                       
                     </div>
-                    <a class="carousel-control-prev" href="#detailedReports" role="button" data-slide="prev">
+                    <a class="carousel-control-prev" href="#detailedReports" id='prev_btn_slide' role="button" data-slide="prev">
                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                       <span class="sr-only">Previous</span>
                     </a>
-                    <a class="carousel-control-next" href="#detailedReports" role="button" data-slide="next">
+                    <a class="carousel-control-next" id='next_btn_slide' href="#detailedReports" role="button" data-slide="next">
                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
                       <span class="sr-only">Next</span>
                     </a>
@@ -121,7 +121,8 @@
 
                 $.get(e.target.getAttribute('href'), function(data, status){
                     e.target.remove();
-                    alert(JSON.parse(data)['msg'])
+                    document.getElementById('next_btn_slide').click()
+                    //alert(JSON.parse(data)['msg'])
                 });
                 
             }
@@ -151,7 +152,8 @@
             }).done(function (data) {
                
                e.target.remove();
-               alert(JSON.parse(data)['msg'])
+               document.getElementById('next_btn_slide').click()
+               //alert(JSON.parse(data)['msg'])
             });
         }
     })

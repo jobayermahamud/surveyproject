@@ -7,7 +7,7 @@
     /* outline: none; */
     margin-left: 15px;
     vertical-align: top;
-    margin-top: -9px;
+    margin-top: -28px;
     width: 94%;
 
     }
@@ -313,32 +313,35 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Option type</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" class="form-check-input" name="opt_type" id="text_opt_sl" value="0">
-                                Textbox
+                                Text
                               <i class="input-helper"></i></label>
                             </div>
                           </div>
-                          <div class="col-sm-5">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" class="form-check-input" name="opt_type" id="multi_opt_sl" value="1">
                                 
-                                Multiple option
+                                MCQ
                               <i class="input-helper"></i></label>
                              
                             </div>
                           </div>
                         </div>
                       </div>
+                     
 
-                      <div class="col-md-12" id='multi_con' style='display:none'>
-                        <div class="form-group row">
-                          <input type="checkbox" name='multi_opt[]' value='0'/><input type='text' class='opt_lable_text' name='opt_label[]' value='Option 1'/>
-                        </div>
-                        <div class="form-group row">
+                      <div class="col-md-6" id='multi_con' style='display:none'>
+                        <div id='option_container'>
+                          <div class="form-group row">
+                            <input  checked type="checkbox" name='multi_opt[]' value='0'/>&nbsp;&nbsp;<input autocomplete='off' type='text' class='opt_lable_text' name='opt_label[]' value='Option 1'/>
+                          </div>
+                        
+                        {{-- <div class="form-group row">
                           <input type="checkbox" name='multi_opt[]' value='1'/><input type='text' class='opt_lable_text' name='opt_label[]' value='Option 2'/>
                         </div>
                         <div class="form-group row">
@@ -352,17 +355,20 @@
                         </div>
                         <div class="form-group row">
                           <input type="checkbox" name='multi_opt[]' value='5'/><input type='text' class='opt_lable_text' name='opt_label[]' value='Option 6'/>
-                        </div>
+                        </div> --}}
                       </div>
+                        <a id='q_add_new_option' data-toggle="tooltip" data-placement="top" title="ADD NEW OPTION" class='btn btn-sm btn-success ti-plus'></a>
+                      </div>
+
 
                        <div class="col-md-12" id='text_con' style='display:none'>
                          <div class="form-group row">
                           {{-- <label class="form-check-label">Add title for this option </label>  --}}
                          </div> 
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                           
                           <textarea style='width:70%' name='text_area_option'></textarea>
-                        </div>
+                        </div> --}}
                         
                       </div>
 
@@ -370,7 +376,7 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Status</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" checked class="form-check-input" name="sts_opt" id="membershipRadios1" value="1" checked="">
@@ -398,7 +404,7 @@
                         <div class="form-group row">
                           {{-- <label class="col-sm-3 col-form-label"></label> --}}
                           <div class="col-sm-9">
-                            <input type="submit" value='ADD' class="form-control btn-success">
+                            <input type="submit" value='SAVE' class="form-control btn-success">
                           </div>
                         </div>
                       </div>
@@ -428,12 +434,27 @@
   <script>
       
     $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip()
     $("#multi_opt_sl").click(function(e){
         document.getElementById('multi_con').style=''
-        document.getElementById('text_con').style='display:none'
+        // document.getElementById('text_con').style='display:none'
     });
+    $('#q_add_new_option').click(function(){
+      $('#option_container').append(`<div id='opt_con_${(document.getElementById('option_container').children.length+1)}' style='position:relative' class="form-group row">
+                            <input  checked type="checkbox" name='multi_opt[]' value='0'/>&nbsp;&nbsp;<input autocomplete='off' type='text' class='opt_lable_text' name='opt_label[]' value='Option 1'/>
+                             <a opt_id_ref='${(document.getElementById('option_container').children.length+1)}' href='#' style='position:absolute;left:100%' class='del-opt btn btn-sm btn-danger ti-trash'></a>
+                            
+                          </div>`)
+    })
+
+     addEventListener('click',(e)=>{
+       if(e.target.hasAttribute('opt_id_ref')){
+         e.preventDefault();
+         document.getElementById('opt_con_'+e.target.getAttribute('opt_id_ref')).remove();
+       }
+     })
     $("#text_opt_sl").click(function(){
-       document.getElementById('text_con').style=''
+      //  document.getElementById('text_con').style=''
        document.getElementById('multi_con').style='display:none'
     });
     });

@@ -394,7 +394,7 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Status</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" checked class="form-check-input" name="sts_opt" id="membershipRadios1" value="1" checked="">
@@ -422,7 +422,7 @@
                         <div class="form-group row">
                           {{-- <label class="col-sm-3 col-form-label"></label> --}}
                           <div class="col-sm-9">
-                            <input type="submit" value='ADD' class="form-control btn-success">
+                            <input type="submit" value='SAVE' class="form-control btn-success">
                           </div>
                         </div>
                       </div>

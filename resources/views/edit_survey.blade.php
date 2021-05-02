@@ -11,6 +11,11 @@
     width: 94%;
 
     }
+
+    div.dataTables_wrapper div.dataTables_filter input{
+      display:block;
+      margin:0px;
+    }
 </style>
 <body>
   <div class="container-scroller">
@@ -344,42 +349,86 @@
                         </div>
                       </div>
                       <hr>
-                      <div class="col-md-10">
-                          <h5>Edit question from below</h5>
+                      <div class="col-md-6">
+                          <h5>Selected question list</h5>
+                          <hr>
                         <div class="table-responsive pt-3">
-                    <table id='questions' class="table table-bordered">
-                      <thead>
-                        <tr>
-                          
-                          <th>
-                            Question lists
-                          </th>
-                          
-                          
-                          
-                          
-                        </tr>
-                      </thead>
-                      <tbody>
-                        
-                        @foreach ($questions as $question)
-                        
-                            <tr>
-                              <td>
-                                  <input add_url='{{URL::signedRoute('add_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' rm_url='{{URL::signedRoute('rm_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' {{checkQuestionExists($question->id,$surveyDetails[0]->id) ? 'checked' : ''}}  type='checkbox' name='question_list[]' value='{{$question->id}}'/>&nbsp;&nbsp;{{$question->question_name}}
-                              </td>
-                            
-                            
-                             </tr>
-                        
-                        
-                        @endforeach  
-                        
-                        
-                      </tbody>
-                    </table>
-                    <hr>
-                  </div>
+                          <table id='questions' class="table table-bordered">
+                            <thead>
+                              <tr>
+                                
+                                <th>
+                                  Question lists
+                                </th>
+                                
+                                
+                                
+                                
+                              </tr>
+                            </thead>
+                            <tbody>
+                              
+                              @foreach ($questions as $question)
+                                 @if (checkQuestionExists($question->id,$surveyDetails[0]->id))
+                                     
+                                 
+                                  <tr>
+                                    <td>
+                                        <input add_url='{{URL::signedRoute('add_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' rm_url='{{URL::signedRoute('rm_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' {{checkQuestionExists($question->id,$surveyDetails[0]->id) ? 'checked' : ''}}  type='checkbox' name='question_list[]' value='{{$question->id}}'/>&nbsp;&nbsp;{{$question->question_name}}
+                                    </td>
+                                  
+                                  
+                                  </tr>
+                                @endif
+                              
+                              @endforeach  
+                              
+                              
+                            </tbody>
+                          </table>
+                          <hr>
+                        </div>
+                      </div>
+                      {{-- <div class="col-md-1"></div> --}}
+                      <div class="col-md-6">
+                          <h5>Unselected question list</h5>
+                          <hr>
+                        <div class="table-responsive pt-3">
+                          <table id='questions_unselect' class="table table-bordered">
+                            <thead>
+                              <tr>
+                                
+                                <th>
+                                  Question lists
+                                </th>
+                                
+                                
+                                
+                                
+                              </tr>
+                            </thead>
+                            <tbody>
+                              
+                              @foreach ($questions as $question)
+                                @if (!checkQuestionExists($question->id,$surveyDetails[0]->id))
+                                    
+                                
+                                  <tr>
+                                    <td>
+                                        <input add_url='{{URL::signedRoute('add_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' rm_url='{{URL::signedRoute('rm_question', ['qId' => $question->id,'sId' => $surveyDetails[0]->id])}}' {{checkQuestionExists($question->id,$surveyDetails[0]->id) ? 'checked' : ''}}  type='checkbox' name='question_list[]' value='{{$question->id}}'/>&nbsp;&nbsp;{{$question->question_name}}
+                                    </td>
+                                  
+                                  
+                                  </tr>
+                                  @endif
+                              
+                              @endforeach  
+                              
+                              
+                            </tbody>
+                          </table>
+                          <hr>
+                        </div>
                       </div>
                       
 
@@ -389,7 +438,7 @@
                       <div class="col-md-12">
                         <div class="form-group row">
                           <label class="col-sm-3 col-form-label">Status</label>
-                          <div class="col-sm-4">
+                          <div class="col-sm-2">
                             <div class="form-check">
                               <label class="form-check-label">
                                 <input type="radio" checked class="form-check-input" name="sts_opt" id="membershipRadios1" value="1" checked="">
@@ -417,7 +466,7 @@
                         <div class="form-group row">
                           {{-- <label class="col-sm-3 col-form-label"></label> --}}
                           <div class="col-sm-9">
-                            <input type="submit" value='ADD' class="form-control btn-success">
+                            <input type="submit" value='UPDATE' class="form-control btn-success">
                           </div>
                         </div>
                       </div>
@@ -448,6 +497,7 @@
       
     $(document).ready(function(){
         $('#questions').DataTable();
+        $('#questions_unselect').DataTable();
 
         addEventListener('change',(e)=>{
           if(e.target.type!='checkbox'){
