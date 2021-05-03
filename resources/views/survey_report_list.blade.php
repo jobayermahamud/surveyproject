@@ -288,8 +288,7 @@
           <!-- chat tab ends -->
         </div>
       </div>
-      <!-- partial -->
-      <!-- partial:partials/_sidebar.html -->
+      
       @include('layouts.sidemenu')
       <!-- partial -->
       <div class="main-panel">
