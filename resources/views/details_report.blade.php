@@ -300,33 +300,9 @@
             <h3 style='margin-left:30px;width:100%;padding:3px;background-color:white'>Survey name {{$survey->name}}</h3> 
             <hr> 
             
-            @foreach ($processData as $key=>$value)
-            <div class="col-md-12 grid-margin stretch-card">
-                  
-                  <div class="card">
-                        <div class="card-body">
-                        <h4 class="card-title">{{$processData[$key][0]->question_name}}</h4>
-                        @php
-                            $total_part=0;
-                        @endphp
-                        <div>
-                            @foreach ($value as $item)
-                                @php
-                                    $total_part+=$item->total;
-                                @endphp
-                                <p>{{$item->option_value}} ({{$item->total}})</p>
-                            @endforeach
-                            
-                        </div>
-                        <h3>Total participate : {{$total_part}}</h3>
-                        </div>
-                  </div>
-               
-              
-            </div>
-            @endforeach 
-            <hr>
-            @if (count($surveyTextOption)>0)
+            
+            
+            
                 <div style='background-color:white' class="table-responsive pt-3">
                     <table id='' class="table table-bordered">
                       <thead>
@@ -336,21 +312,63 @@
                             Question name
                           </th>
                           <th>
-                              Comment
+                              Option list
                           </th>
                           
-                          
+                          <th>
+                              Total
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
+                        @php
+                            $questionId=0
+                        @endphp
+                        @foreach ($processData as $key=>$data)
+                            @foreach ($data as $item)
+                            <tr>
+                              @if ($questionId!=$key)
+                                  @php
+                                      $questionId=$key
+                                  @endphp
+                                  
+                                    <td rowspan='{{count($processData[$key])}}'>{{$item->question_name}}</td>
+                                    <td>{{$item->option_value}}</td>
+                                    <td>{{$item->total}}</td>
+                                  
+                              @else
+                                  
+                                    <td>{{$item->option_value}}</td>
+                                    <td>{{$item->total}}</td>
+                                  
+                                  
+                              @endif
+                                </tr>
+                            @endforeach
+                            
+                        @endforeach
+                        @php
+                            $questionId=0;
+                        @endphp
                         @foreach ($surveyTextOption as $text)
                            <tr>
-                             <td>
+                             @if ($questionId != $text->question_id)
+                                <td rowspan="{{getTotalAnswer($text->question_id,$text->id)}}">
                                  {{$text->question_name}}
-                             </td>
-                             <td>
-                                 {{$text->option_value}}
-                             </td>
+                                </td>
+                                <td colspan='2'>
+                                    {{$text->option_value}}
+                                </td>
+                                @php
+                                    $questionId=$text->question_id;
+                                @endphp
+                             @else
+                                 
+                                  <td colspan='2'>
+                                      {{$text->option_value}}
+                                  </td>
+                             @endif
+                             
                             </tr>
                         @endforeach  
                         
@@ -358,7 +376,7 @@
                       </tbody>
                     </table>
                   </div>
-            @endif
+            
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->

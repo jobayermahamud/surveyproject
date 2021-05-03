@@ -32,7 +32,7 @@
                                             <hr>
                                             
                                         @else
-                                            <textarea id='textoption_{{$value[$i]['question_id']}}' style='width:70%'></textarea>
+                                            <textarea id='textoption_{{$value[$i]['question_id']}}' style='width:70%'></textarea></br>
                                         @endif
                                         
                                     @endfor
@@ -62,7 +62,7 @@
                                             <hr>
                                             
                                         @else
-                                            <textarea id='textoption_{{$value[$i]['question_id']}}' style='width:70%'></textarea>
+                                            <textarea id='textoption_{{$value[$i]['question_id']}}' style='width:70%'></textarea></br>
                                             
                                         @endif
                                         

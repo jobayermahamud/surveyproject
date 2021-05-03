@@ -11,4 +11,11 @@ function checkQuestionExists($questionId,$surveyId){
       }
 }
 
+
+function getTotalAnswer($questionId,$surveyId){
+    $data=DB::table('surveyresult')->where('survey_id',$surveyId)->where('question_id',$questionId)->get();
+
+    return count($data);
+}
+
 ?>

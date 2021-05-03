@@ -269,6 +269,7 @@ class SurveyController extends Controller
                     ->select('question.id as question_id','question.question_name','surveyresult.option_value','survey.id','survey.survey_name')
                     ->where('survey.id',$surveyId)
                     ->where('surveyresult.option_type',0)
+                    ->orderBy('question.id')
                     ->get();
         
         
@@ -287,9 +288,9 @@ class SurveyController extends Controller
 
         $survey=Survey::where('id',$surveyId)->get()[0];
 
-        echo '<pre>';
-        print_r($surveyMultipleChooseResult);
-        return;            
+        // echo '<pre>';
+        // print_r($processData);
+        // return;            
         
         return view('details_report',compact('processData','survey','surveyTextOption'));
 
