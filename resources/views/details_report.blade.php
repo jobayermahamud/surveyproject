@@ -297,14 +297,14 @@
           
           
           <div class="row">
-            <h3 style='margin-left:30px;width:100%;padding:3px;background-color:white'>Survey name {{$survey->name}}</h3> 
+            <h3 style='text-align:center;margin-left:30px;width:100%;padding:3px;background-color:white'>Survey name {{$survey->name}}</h3> 
             <hr> 
             
             
             
             
                 <div style='background-color:white' class="table-responsive pt-3">
-                    <table id='' class="table table-bordered">
+                    <table id='report_survey' class="table table-bordered">
                       <thead>
                         <tr>
                           
@@ -403,7 +403,7 @@
   <script>
       $(document).ready(function(){
        $('[data-toggle="tooltip"]').tooltip()
-        $('#questions').DataTable();
+        $('#report_survey').DataTable();
         addEventListener('change',(e)=>{
             if(e.target.type='checkbox'){
                 $.get(e.target.getAttribute('url_ref'), function(data, status){

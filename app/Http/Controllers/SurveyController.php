@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Http\Request;
 use App\Models\Survey;
 use App\Models\Question;
@@ -259,7 +262,8 @@ class SurveyController extends Controller
                     ->groupBy('question.question_name')
                     ->where('surveyresult.option_type',1)
                     ->where('survey.id',$surveyId)
-                    ->orderBy('total')
+                    ->orderBy('surveyresult.option_id')
+                    ->orderBy('total','desc')
                     ->orderBy('surveyresult.option_id')
                     ->get();
         
@@ -290,7 +294,78 @@ class SurveyController extends Controller
 
         // echo '<pre>';
         // print_r($processData);
-        // return;            
+        // return;  
+        $questionId=0;
+        $counter=2;
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $sheet->setCellValue('A1','Question name');
+        $spreadsheet->getActiveSheet()->getStyle('A1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+          $spreadsheet->getActiveSheet()->getStyle('A1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $spreadsheet->getActiveSheet()->getStyle('A1')
+                    ->getFill()->getStartColor()->setARGB('000000');  
+        
+        $sheet->setCellValue('B1','Option');
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+                    ->getFill()->getStartColor()->setARGB('000000');   
+        
+        $sheet->setCellValue('C1','Total');
+        $spreadsheet->getActiveSheet()->getStyle('C1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+        $spreadsheet->getActiveSheet()->getStyle('C1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+          $spreadsheet->getActiveSheet()->getStyle('C1')
+                    ->getFill()->getStartColor()->setARGB('000000');   
+        
+        foreach ($processData as $key => $value) {
+            for ($i=0; $i <count($value) ; $i++) { 
+                if($questionId!=$key){
+                    $sheet->setCellValue('A'.$counter,$value[$i]->question_name);
+                    $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
+                    $sheet->setCellValue('C'.$counter,$value[$i]->total);
+                    $questionId=$key;
+                    $counter++;
+                }else{
+                    $sheet->setCellValue('A'.$counter,'');
+                    $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
+                    $sheet->setCellValue('C'.$counter,$value[$i]->total);
+                    $counter++;
+                }
+            }
+            
+        }
+
+        $questionId=0;
+
+        for ($i=0; $i < count($surveyTextOption); $i++) { 
+            if($questionId!=$surveyTextOption[$i]->question_id){
+                $sheet->setCellValue('A'.$counter,$surveyTextOption[$i]->question_name);
+                $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
+                $questionId=$surveyTextOption[$i]->question_id;
+                $counter++;
+            }else{
+                $sheet->setCellValue('A'.$counter,'');
+                $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
+                $counter++;
+            }
+             
+        }
+        
+        
+    //    print_r($spreadsheet->cellXfSupervisor());
+    //    return;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($surveyTextOption[0]->survey_name.'.xlsx');
+
+        return;
         
         return view('details_report',compact('processData','survey','surveyTextOption'));
 
