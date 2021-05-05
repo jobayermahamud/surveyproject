@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\Survey;
 use App\Models\Question;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 
 class SurveyController extends Controller
 {
@@ -251,20 +253,48 @@ class SurveyController extends Controller
         }
 
 
-        $surveyMultipleChooseResult=DB::table('surveyresult')
-                    ->join('survey','surveyresult.survey_id','=','survey.id')
-                    ->join('question','surveyresult.question_id','=','question.id')
-                    ->select(DB::raw('question.id as question_id,question.question_name,surveyresult.option_value,survey.id,survey.survey_name,COUNT(surveyresult.survey_id) as total'))
-                    ->groupBy('survey.id')
-                    ->groupBy('surveyresult.option_value')
-                    ->groupBy('survey.survey_name')
-                    ->groupBy('question.id')
-                    ->groupBy('question.question_name')
-                    ->where('surveyresult.option_type',1)
-                    ->where('survey.id',$surveyId)
-                    ->orderBy('surveyresult.option_id')
-                    ->orderBy('total','desc')
-                    ->orderBy('surveyresult.option_id')
+        
+
+        $survey=Survey::where('id',$surveyId)->get()[0];
+
+        $surveyQuestionList=DB::table('survey_question')
+                           ->join('question','question.id','=','survey_question.question_id')
+                           ->join('survey','survey.id','=','survey_question.survey_id')
+                           ->where('survey_id',$surveyId)
+                           ->get();
+
+        return view('details_report',compact('surveyQuestionList','survey')); 
+        
+        
+    
+
+       
+        
+        
+
+    }
+
+    public function exportExcel(Request $request,$surveyId){
+        if (! $request->hasValidSignature()) {
+            abort(401);
+        }
+
+        $surveyMultipleChooseResult=DB::table('question_option')
+                    ->leftJoin('surveyresult','question_option.id','=','surveyresult.option_id')
+                    ->leftJoin('survey','surveyresult.survey_id','=','survey.id')
+                    ->leftJoin('question','surveyresult.question_id','=','question.id')
+                    //->select(DB::raw('question.id as question_id,question.question_name,surveyresult.option_value,survey.id,survey.survey_name,COUNT(surveyresult.survey_id) as total'))
+                    ->select('question_option.*')
+                    // ->groupBy('survey.id')
+                    // ->groupBy('surveyresult.option_value')
+                    // ->groupBy('survey.survey_name')
+                    // ->groupBy('question.id')
+                    // ->groupBy('question.question_name')
+                    // ->where('surveyresult.option_type',1)
+                    // ->where('survey.id',$surveyId)
+                    // ->orderBy('surveyresult.option_id')
+                    // ->orderBy('total','desc')
+                    // ->orderBy('surveyresult.option_id')
                     ->get();
         
         $surveyTextOption= DB::table('surveyresult')
@@ -292,11 +322,12 @@ class SurveyController extends Controller
 
         $survey=Survey::where('id',$surveyId)->get()[0];
 
-        // echo '<pre>';
-        // print_r($processData);
-        // return;  
+        echo '<pre>';
+        print_r($processData);
+        return;  
         $questionId=0;
         $counter=2;
+        $mergeArray=array(1,1);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         
@@ -307,7 +338,7 @@ class SurveyController extends Controller
     ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $spreadsheet->getActiveSheet()->getStyle('A1')
                     ->getFill()->getStartColor()->setARGB('000000');  
-        
+        $spreadsheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(30);
         $sheet->setCellValue('B1','Option');
         $spreadsheet->getActiveSheet()->getStyle('B1')
           ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
@@ -327,48 +358,115 @@ class SurveyController extends Controller
         foreach ($processData as $key => $value) {
             for ($i=0; $i <count($value) ; $i++) { 
                 if($questionId!=$key){
+                    
+                    
+                    $mergeArray=array();
                     $sheet->setCellValue('A'.$counter,$value[$i]->question_name);
                     $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
                     $sheet->setCellValue('C'.$counter,$value[$i]->total);
                     $questionId=$key;
+                    array_push($mergeArray,$counter);
                     $counter++;
+
                 }else{
+                    array_push($mergeArray,$counter);
                     $sheet->setCellValue('A'.$counter,'');
                     $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
                     $sheet->setCellValue('C'.$counter,$value[$i]->total);
                     $counter++;
                 }
             }
+
+            $spreadsheet->getActiveSheet()->mergeCells('A'.$mergeArray[0].':A'.$mergeArray[count($mergeArray)-1]);
+            //print_r('A'.$mergeArray[0].':'.$mergeArray[count($mergeArray)-1]);
             
         }
 
         $questionId=0;
-
+        // $merge='A'.$counter.':';
         for ($i=0; $i < count($surveyTextOption); $i++) { 
             if($questionId!=$surveyTextOption[$i]->question_id){
+
+                $mergeArray=array();
+
+
                 $sheet->setCellValue('A'.$counter,$surveyTextOption[$i]->question_name);
                 $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
+                $spreadsheet->getActiveSheet()->mergeCells('B'.$counter.':C'.$counter);
                 $questionId=$surveyTextOption[$i]->question_id;
+                array_push($mergeArray,$counter);
                 $counter++;
             }else{
+                array_push($mergeArray,$counter);
                 $sheet->setCellValue('A'.$counter,'');
                 $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
+                $spreadsheet->getActiveSheet()->mergeCells('B'.$counter.':C'.$counter);
                 $counter++;
             }
+
+             $spreadsheet->getActiveSheet()->mergeCells('A'.$mergeArray[0].':A'.$mergeArray[count($mergeArray)-1]);
              
         }
         
         
-    //    print_r($spreadsheet->cellXfSupervisor());
-    //    return;
+    
 
         $writer = new Xlsx($spreadsheet);
-        $writer->save($surveyTextOption[0]->survey_name.'.xlsx');
-
-        return;
+        $writer->save($survey->survey_name.'.xlsx');
         
-        return view('details_report',compact('processData','survey','surveyTextOption'));
+        return Storage::download($survey->survey_name.'.xlsx');
+        
+        
+
+    }
+
+
+
+
+     public function surveyPdfExport(Request $request,$surveyId){
+        if (! $request->hasValidSignature()) {
+            abort(401);
+        }
+        $surveyQuestionList=DB::table('survey_question')
+                           ->join('question','question.id','=','survey_question.question_id')
+                           ->join('survey','survey.id','=','survey_question.survey_id')
+                           ->where('survey_id',$surveyId)
+                           ->get();
+
+
+        // echo '<pre>';
+        // print_r($surveyQuestionList);
+        // return;  
+        
+
+        return view('survey_pdf',compact('surveyQuestionList')); 
+        
+        
+    
+
+       
+        
+        
 
     }
     
+
+
+
+    public function surveyReportTest(Request $request,$surveyId){
+        $surveyQuestionList=DB::table('survey_question')
+                           ->join('question','question.id','=','survey_question.question_id')
+                           ->join('survey','survey.id','=','survey_question.survey_id')
+                           ->where('survey_id',$surveyId)
+                           ->get();
+
+
+        // echo '<pre>';
+        // print_r($surveyQuestionList);
+        // return;  
+        
+        return view('test_report',compact('surveyQuestionList'));
+    }
+
+
 }

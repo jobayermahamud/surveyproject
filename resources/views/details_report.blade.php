@@ -297,14 +297,15 @@
           
           
           <div class="row">
+            <div style='margin-bottom:10px'>
+              <a class='btn btn-primary btn-sm' href='{{URL::signedRoute('report_excel', ['surveyId' => $survey->id])}}'>EXPORT IN EXCEL</a>
+              <a class='btn btn-sm btn-primary' href='{{URL::signedRoute('report_pdf', ['surveyId' => $survey->id])}}'>PRINT PDF</a>
+            </div>
+          <hr>
             <h3 style='text-align:center;margin-left:30px;width:100%;padding:3px;background-color:white'>Survey name {{$survey->name}}</h3> 
             <hr> 
-            
-            
-            
-            
-                <div style='background-color:white' class="table-responsive pt-3">
-                    <table id='report_survey' class="table table-bordered">
+            <div style='background-color:white'  class="table-responsive pt-3">
+                    <table style='border-left:1px solid #CED4DA;padding:10px;margin-left:10px' id='report_survey' class="table table-bordered">
                       <thead>
                         <tr>
                           
@@ -320,7 +321,7 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
+                      {{-- <tbody>
                         @php
                             $questionId=0
                         @endphp
@@ -373,7 +374,70 @@
                         @endforeach  
                         
                         
-                      </tbody>
+                      </tbody> --}}
+                      <tbody>
+            @foreach ($surveyQuestionList as $item)
+               @if ($item->option_type)
+                @php
+                    $options=getQuestionOptions($item->question_id);
+                    $counter=true;
+                @endphp
+                @foreach ($options as $opt)
+                   @if ($counter)
+                       <tr>
+                            <td rowspan='{{count(getQuestionOptions($item->question_id))}}'>{{$item->question_name}}</td>
+                            <td>{{$opt->option_title}}</td>
+                            <td>{{getVotes($item->survey_id,$item->question_id,$opt->id)}}</td>
+                        </tr>
+                        @php
+                            $counter=false;
+                        @endphp
+                   @else
+                       <tr>
+                            {{-- <td rowspan='{{count(getQuestionOptions($item->question_id))}}'>{{$item->question_name}}</td> --}}
+                            <td>{{$opt->option_title}}</td>
+                            <td>{{getVotes($item->survey_id,$item->question_id,$opt->id)}}</td>
+                        </tr>
+                   @endif
+                    
+                @endforeach
+                
+                
+               @else
+                 @php
+                    $texts=getTexts($item->survey_id,$item->question_id);
+                    $counter=true;
+                 @endphp
+                @if (count($texts)>0)
+                    @foreach ($texts as $text)
+                        @if ($counter)
+                            <tr>
+                                <td rowspan='{{count($texts)}}'>{{$item->question_name}}</td>
+                                <td colspan='2'>{{$text->option_value}}</td>
+                                
+                            </tr>
+                            @php
+                                $counter=false;
+                            @endphp
+                        @else
+                            <tr>
+                                <td colspan='2'>{{$text->option_value}}</td>
+                                
+                            </tr>
+                        @endif
+                    @endforeach
+                @else
+                    <tr>
+                        <td>{{$item->question_name}}</td>
+                        <td colspan='2'>NO ANSWER</td>
+                        
+                    </tr>
+                @endif
+                
+               @endif
+                
+            @endforeach
+        </tbody>
                     </table>
                   </div>
             

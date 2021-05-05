@@ -48,13 +48,32 @@ class FrontendController extends Controller
             return json_encode(array('msg'=>'Unauthorized action'));
         }
 
-        DB::table('surveyresult')->insert([
-            'survey_id' => $surveyId,
-            'question_id' => $questionId,
-            'option_id' => $optionId,
-            'option_value' => $optionValue,
-            'option_type' => 1
-        ]);
+        $check=DB::table('surveyresult')
+               ->where('survey_id',$surveyId)
+               ->where('question_id',$questionId)
+               ->where('option_id',$optionId)
+               ->where('option_value',$optionValue)->get();
+        
+        if(count($check)>0){
+            DB::table('surveyresult')
+               ->where('survey_id',$surveyId)
+               ->where('question_id',$questionId)
+               ->where('option_id',$optionId)
+               ->where('option_value',$optionValue)->update(['votes'=>($check[0]->votes+1)]);
+        }else{
+             DB::table('surveyresult')->insert([
+                'survey_id' => $surveyId,
+                'question_id' => $questionId,
+                'option_id' => $optionId,
+                'option_value' => $optionValue,
+                'option_type' => 1,
+                'votes'=>1
+            ]);
+        }       
+               
+               
+
+       
 
         return json_encode(array('msg'=>'Thanks for your opinion'));
     }

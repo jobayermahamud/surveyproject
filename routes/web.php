@@ -52,6 +52,12 @@ Route::match(['get'], 'rm_question/{qId}/{sId}',[SurveyController::class,'rmQues
 Route::match(['get','post'], 'survey_edit/{surveyId}',[SurveyController::class,'surveyEdit'])->name('survey_edit');
 Route::match(['get'], 'surveyreport',[SurveyController::class,'surveyReportList'])->name('sr_report');
 Route::match(['get'], 'fullreport/{surveyId}',[SurveyController::class,'surveyReportFull'])->name('report_details');
+Route::match(['get'], 'excelreport/{surveyId}',[SurveyController::class,'exportExcel'])->name('report_excel');
+Route::match(['get'], 'pdfreport/{surveyId}',[SurveyController::class,'surveyPdfExport'])->name('report_pdf');
+
+
+Route::match(['get'], 'testreport/{surveyId}',[SurveyController::class,'surveyReportTest'])->name('test_report');
+
 // Survey Route end
 
 

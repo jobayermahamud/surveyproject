@@ -323,7 +323,9 @@
                                <td>{{$survey->survey_name}}</td>
                                <td width='50px'>
                                  <a href='{{URL::signedRoute('report_details', ['surveyId' => $survey->id])}}' data-toggle="tooltip" data-placement="top" title='SEE FULL REPORT' class='ti-files btn btn-primary btn-sm'></a>
-                               </td>
+                                 <a class='btn btn-primary btn-sm ti-export' data-toggle="tooltip" data-placement="top" title='EXPORT IN EXCEL' href='{{URL::signedRoute('report_excel', ['surveyId' => $survey->id])}}'></a>
+                                 <a class='btn btn-sm btn-primary ti-printer' data-toggle="tooltip" data-placement="top" title='PRINT IN PDF' href='{{URL::signedRoute('report_pdf', ['surveyId' => $survey->id])}}'></a>
+                                </td>
                              </tr>
                          @endforeach
                         
