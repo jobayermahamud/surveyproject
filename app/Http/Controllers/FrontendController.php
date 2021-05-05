@@ -16,9 +16,12 @@ class FrontendController extends Controller
                 ->join('question','survey_question.question_id','=','question.id')
                 ->leftJoin('question_option','question.id','=','question_option.question_id')
                 ->select('survey.*','question.id as question_id','question.option_type','question.question_name','question_option.id as option_id','question_option.option_title')
+                ->orderBy('question.id','desc')
                 ->where('survey.date_to','>=',$date)->where('survey.survey_status',1)
                 ->get()->toArray();
     
+
+                
         $processData=array();
 
         for($i=0;$i<count($survey);$i++){
@@ -39,6 +42,7 @@ class FrontendController extends Controller
         // echo '<pre>';
         // print_r($processData);
         // return;
+        // ksort($processData);
         return view('front',compact('processData'));
     } 
 

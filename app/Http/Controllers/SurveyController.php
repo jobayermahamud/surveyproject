@@ -261,6 +261,7 @@ class SurveyController extends Controller
                            ->join('question','question.id','=','survey_question.question_id')
                            ->join('survey','survey.id','=','survey_question.survey_id')
                            ->where('survey_id',$surveyId)
+                           ->orderBy('question.id','desc')
                            ->get();
 
         return view('details_report',compact('surveyQuestionList','survey')); 
@@ -431,6 +432,7 @@ class SurveyController extends Controller
                            ->join('question','question.id','=','survey_question.question_id')
                            ->join('survey','survey.id','=','survey_question.survey_id')
                            ->where('survey_id',$surveyId)
+                           ->orderBy('question.id','desc')
                            ->get();
 
 
