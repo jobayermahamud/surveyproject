@@ -280,58 +280,24 @@ class SurveyController extends Controller
             abort(401);
         }
 
-        $surveyMultipleChooseResult=DB::table('question_option')
-                    ->leftJoin('surveyresult','question_option.id','=','surveyresult.option_id')
-                    ->leftJoin('survey','surveyresult.survey_id','=','survey.id')
-                    ->leftJoin('question','surveyresult.question_id','=','question.id')
-                    //->select(DB::raw('question.id as question_id,question.question_name,surveyresult.option_value,survey.id,survey.survey_name,COUNT(surveyresult.survey_id) as total'))
-                    ->select('question_option.*')
-                    // ->groupBy('survey.id')
-                    // ->groupBy('surveyresult.option_value')
-                    // ->groupBy('survey.survey_name')
-                    // ->groupBy('question.id')
-                    // ->groupBy('question.question_name')
-                    // ->where('surveyresult.option_type',1)
-                    // ->where('survey.id',$surveyId)
-                    // ->orderBy('surveyresult.option_id')
-                    // ->orderBy('total','desc')
-                    // ->orderBy('surveyresult.option_id')
-                    ->get();
+        $surveyQuestionList=DB::table('survey_question')
+                           ->join('question','question.id','=','survey_question.question_id')
+                           ->join('survey','survey.id','=','survey_question.survey_id')
+                           ->where('survey_id',$surveyId)
+                           ->orderBy('question.id','desc')
+                           ->get();
         
-        $surveyTextOption= DB::table('surveyresult')
-                    ->join('survey','surveyresult.survey_id','=','survey.id')
-                    ->join('question','surveyresult.question_id','=','question.id')
-                    ->select('question.id as question_id','question.question_name','surveyresult.option_value','survey.id','survey.survey_name')
-                    ->where('survey.id',$surveyId)
-                    ->where('surveyresult.option_type',0)
-                    ->orderBy('question.id')
-                    ->get();
+        $survey=Survey::find($surveyId);
+
+        // echo '<pre>';
+        // print_r($surveyQuestionList);
+        // return;
         
         
 
-
-        $processData=array();
-        for($i=0;$i<count($surveyMultipleChooseResult);$i++){
-            //echo $surveyMultipleChooseResult[$i]->question_id;
-            if(isset($processData[$surveyMultipleChooseResult[$i]->question_id])){
-                array_push($processData[$surveyMultipleChooseResult[$i]->question_id],$surveyMultipleChooseResult[$i]);
-            }else{
-                $processData[$surveyMultipleChooseResult[$i]->question_id]=array();
-                array_push($processData[$surveyMultipleChooseResult[$i]->question_id],$surveyMultipleChooseResult[$i]);
-            }
-        }
-
-        $survey=Survey::where('id',$surveyId)->get()[0];
-
-        echo '<pre>';
-        print_r($processData);
-        return;  
-        $questionId=0;
-        $counter=2;
-        $mergeArray=array(1,1);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+        $cellCounter=2;
         $sheet->setCellValue('A1','Question name');
         $spreadsheet->getActiveSheet()->getStyle('A1')
           ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
@@ -356,64 +322,51 @@ class SurveyController extends Controller
           $spreadsheet->getActiveSheet()->getStyle('C1')
                     ->getFill()->getStartColor()->setARGB('000000');   
         
-        foreach ($processData as $key => $value) {
-            for ($i=0; $i <count($value) ; $i++) { 
-                if($questionId!=$key){
-                    
-                    
-                    $mergeArray=array();
-                    $sheet->setCellValue('A'.$counter,$value[$i]->question_name);
-                    $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
-                    $sheet->setCellValue('C'.$counter,$value[$i]->total);
-                    $questionId=$key;
-                    array_push($mergeArray,$counter);
-                    $counter++;
 
+        foreach ($surveyQuestionList as $question) {
+            $arrayToMerge=array();
+            if($question->option_type){
+                $options=getQuestionOptions($question->question_id);
+                
+                foreach ($options as $option) {
+                    array_push($arrayToMerge,$cellCounter);
+                    $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                    $sheet->setCellValue('B'.$cellCounter,$option->option_title);
+                    $sheet->setCellValue('C'.$cellCounter,getVotes($question->survey_id,$question->question_id,$option->id));
+                    $cellCounter++;
+                }
+            }else{
+                $texts=getTexts($question->survey_id,$question->question_id);
+                //"A".$cellCounter.':A'.((count($texts)+$cellCounter)-1);
+                //$cellCounter++;
+                if(count($texts)>0){
+                    foreach ($texts as $text) {
+                        array_push($arrayToMerge,$cellCounter);
+                        //$spreadsheet->getActiveSheet()->mergeCells('A'.$cellCounter.':A'.((count($texts)+$cellCounter)-1));
+                        $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                        $sheet->setCellValue('B'.$cellCounter,$text->option_value);
+                        $sheet->setCellValue('C'.$cellCounter,'');
+                        $spreadsheet->getActiveSheet()->mergeCells('B'.$cellCounter.':C'.$cellCounter);
+                        $cellCounter++;
+                    }
+                    
                 }else{
-                    array_push($mergeArray,$counter);
-                    $sheet->setCellValue('A'.$counter,'');
-                    $sheet->setCellValue('B'.$counter,$value[$i]->option_value);
-                    $sheet->setCellValue('C'.$counter,$value[$i]->total);
-                    $counter++;
+                    array_push($arrayToMerge,$cellCounter);
+                    //$spreadsheet->getActiveSheet()->mergeCells('A'.$cellCounter.':A'.$cellCounter);
+                    $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                    $sheet->setCellValue('B'.$cellCounter,"No answer");
+                    $sheet->setCellValue('C'.$cellCounter,'');
+                    $spreadsheet->getActiveSheet()->mergeCells('B'.$cellCounter.':C'.$cellCounter);
+                    $cellCounter++;
                 }
             }
 
-            $spreadsheet->getActiveSheet()->mergeCells('A'.$mergeArray[0].':A'.$mergeArray[count($mergeArray)-1]);
-            //print_r('A'.$mergeArray[0].':'.$mergeArray[count($mergeArray)-1]);
-            
-        }
-
-        $questionId=0;
-        // $merge='A'.$counter.':';
-        for ($i=0; $i < count($surveyTextOption); $i++) { 
-            if($questionId!=$surveyTextOption[$i]->question_id){
-
-                $mergeArray=array();
-
-
-                $sheet->setCellValue('A'.$counter,$surveyTextOption[$i]->question_name);
-                $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
-                $spreadsheet->getActiveSheet()->mergeCells('B'.$counter.':C'.$counter);
-                $questionId=$surveyTextOption[$i]->question_id;
-                array_push($mergeArray,$counter);
-                $counter++;
-            }else{
-                array_push($mergeArray,$counter);
-                $sheet->setCellValue('A'.$counter,'');
-                $sheet->setCellValue('B'.$counter,$surveyTextOption[$i]->option_value);
-                $spreadsheet->getActiveSheet()->mergeCells('B'.$counter.':C'.$counter);
-                $counter++;
-            }
-
-             $spreadsheet->getActiveSheet()->mergeCells('A'.$mergeArray[0].':A'.$mergeArray[count($mergeArray)-1]);
-             
-        }
-        
-        
-    
+            $spreadsheet->getActiveSheet()->mergeCells('A'.$arrayToMerge[0].':A'.$arrayToMerge[count($arrayToMerge)-1]);
+        }            
 
         $writer = new Xlsx($spreadsheet);
-        $writer->save($survey->survey_name.'.xlsx');
+        $writer->save($survey->survey_name.'.xlsx');            
+
         
         return Storage::download($survey->survey_name.'.xlsx');
         
@@ -460,14 +413,90 @@ class SurveyController extends Controller
                            ->join('question','question.id','=','survey_question.question_id')
                            ->join('survey','survey.id','=','survey_question.survey_id')
                            ->where('survey_id',$surveyId)
+                           ->orderBy('question.id','desc')
                            ->get();
-
+        
+        $survey=Survey::find($surveyId);
 
         // echo '<pre>';
         // print_r($surveyQuestionList);
-        // return;  
+        // return;
         
-        return view('test_report',compact('surveyQuestionList'));
+        
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $cellCounter=2;
+        $sheet->setCellValue('A1','Question name');
+        $spreadsheet->getActiveSheet()->getStyle('A1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+          $spreadsheet->getActiveSheet()->getStyle('A1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $spreadsheet->getActiveSheet()->getStyle('A1')
+                    ->getFill()->getStartColor()->setARGB('000000');  
+        $spreadsheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(30);
+        $sheet->setCellValue('B1','Option');
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $spreadsheet->getActiveSheet()->getStyle('B1')
+                    ->getFill()->getStartColor()->setARGB('000000');   
+        
+        $sheet->setCellValue('C1','Total');
+        $spreadsheet->getActiveSheet()->getStyle('C1')
+          ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_WHITE);
+        $spreadsheet->getActiveSheet()->getStyle('C1')
+    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+          $spreadsheet->getActiveSheet()->getStyle('C1')
+                    ->getFill()->getStartColor()->setARGB('000000');   
+        
+
+        foreach ($surveyQuestionList as $question) {
+            $arrayToMerge=array();
+            if($question->option_type){
+                $options=getQuestionOptions($question->question_id);
+                
+                foreach ($options as $option) {
+                    array_push($arrayToMerge,$cellCounter);
+                    $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                    $sheet->setCellValue('B'.$cellCounter,$option->option_title);
+                    $sheet->setCellValue('C'.$cellCounter,getVotes($question->survey_id,$question->question_id,$option->id));
+                    $cellCounter++;
+                }
+            }else{
+                $texts=getTexts($question->survey_id,$question->question_id);
+                //"A".$cellCounter.':A'.((count($texts)+$cellCounter)-1);
+                //$cellCounter++;
+                if(count($texts)>0){
+                    foreach ($texts as $text) {
+                        array_push($arrayToMerge,$cellCounter);
+                        //$spreadsheet->getActiveSheet()->mergeCells('A'.$cellCounter.':A'.((count($texts)+$cellCounter)-1));
+                        $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                        $sheet->setCellValue('B'.$cellCounter,$text->option_value);
+                        $sheet->setCellValue('C'.$cellCounter,'');
+                        $spreadsheet->getActiveSheet()->mergeCells('B'.$cellCounter.':C'.$cellCounter);
+                        $cellCounter++;
+                    }
+                    
+                }else{
+                    array_push($arrayToMerge,$cellCounter);
+                    //$spreadsheet->getActiveSheet()->mergeCells('A'.$cellCounter.':A'.$cellCounter);
+                    $sheet->setCellValue('A'.$cellCounter,$question->question_name);
+                    $sheet->setCellValue('B'.$cellCounter,"No answer");
+                    $sheet->setCellValue('C'.$cellCounter,'');
+                    $spreadsheet->getActiveSheet()->mergeCells('B'.$cellCounter.':C'.$cellCounter);
+                    $cellCounter++;
+                }
+            }
+
+            $spreadsheet->getActiveSheet()->mergeCells('A'.$arrayToMerge[0].':A'.$arrayToMerge[count($arrayToMerge)-1]);
+        }            
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($survey->survey_name.'.xlsx');            
+        
+        //return view('test_report',compact('surveyQuestionList'));
     }
 
 
